@@ -29,9 +29,13 @@ app.add_middleware(
 )
 
 # Initialize agent orchestrator
-orchestrator = AgentOrchestrator()
+orchestrator: Optional[AgentOrchestrator] = None
 
-app.add_event_handler("startup", orchestrator.initialize)
+@app.on_event("startup")
+async def startup_event():
+    global orchestrator
+    orchestrator = AgentOrchestrator()
+    await orchestrator.initialize()
 
 @app.get("/")
 async def root():
@@ -41,6 +45,8 @@ async def root():
 @app.post("/agent/execute", response_model=AgentResponse)
 async def execute_agent_task(request: AgentRequest):
     """Execute agent task"""
+    if orchestrator is None:
+        raise HTTPException(status_code=503, detail="Agent orchestrator not initialized. Please wait a moment and try again.")
     try:
         result = await orchestrator.execute_task(request)
         return result
@@ -50,11 +56,15 @@ async def execute_agent_task(request: AgentRequest):
 @app.get("/agent/status")
 async def get_agent_status():
     """Get current agent status"""
+    if orchestrator is None:
+        raise HTTPException(status_code=503, detail="Agent orchestrator not initialized. Please wait a moment and try again.")
     return await orchestrator.get_status()
 
 @app.post("/agent/stop")
 async def stop_agent():
     """Stop current agent task"""
+    if orchestrator is None:
+        raise HTTPException(status_code=503, detail="Agent orchestrator not initialized. Please wait a moment and try again.")
     return await orchestrator.stop_current_task()
 
 if __name__ == "__main__":
@@ -64,4 +74,3 @@ if __name__ == "__main__":
         port=8000,
         reload=True
     )
-

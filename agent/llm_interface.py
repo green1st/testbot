@@ -34,7 +34,7 @@ class LLMInterface(ABC):
 class OpenAIInterface(LLMInterface):
     """Interface untuk OpenAI GPT models"""
     
-    def __init__(self, model: str = "gpt-3.5-turbo", api_key: Optional[str] = None):
+    def __init__(self, model: str = "gemini-2.5-flash", api_key: Optional[str] = None):
         if not OPENAI_AVAILABLE:
             raise ImportError("OpenAI package not available")
         
@@ -96,17 +96,28 @@ Respond dalam format JSON:
         response = await self.generate_response(prompt)
         
         try:
-            # Parse JSON response
+            # Try to parse JSON response directly
             action_plan = json.loads(response)
             return action_plan
         except json.JSONDecodeError:
-            # Fallback jika response bukan JSON valid
-            return {
-                "reasoning": "Failed to parse LLM response",
-                "tool_name": "wait",
-                "parameters": {"seconds": 1},
-                "expected_outcome": "Wait and retry"
-            }
+            # If direct parsing fails, try to extract JSON from markdown code block
+            try:
+                import re
+                json_match = re.search(r'```json\n(.*?)```', response, re.DOTALL)
+                if json_match:
+                    action_plan = json.loads(json_match.group(1))
+                    return action_plan
+                else:
+                    raise ValueError("No JSON found in LLM response")
+            except (json.JSONDecodeError, ValueError) as e:
+                # Fallback jika response bukan JSON valid atau tidak ada JSON di markdown
+                print(f"Failed to parse LLM response: {e}. Raw response: {response[:200]}...")
+                return {
+                    "reasoning": "Failed to parse LLM response",
+                    "tool_name": "wait",
+                    "parameters": {"seconds": 1},
+                    "expected_outcome": "Wait and retry"
+                }
 
 class AnthropicInterface(LLMInterface):
     """Interface untuk Anthropic Claude models"""
@@ -170,17 +181,28 @@ Respond dalam format JSON:
         response = await self.generate_response(prompt)
         
         try:
-            # Parse JSON response
+            # Try to parse JSON response directly
             action_plan = json.loads(response)
             return action_plan
         except json.JSONDecodeError:
-            # Fallback jika response bukan JSON valid
-            return {
-                "reasoning": "Failed to parse LLM response",
-                "tool_name": "wait",
-                "parameters": {"seconds": 1},
-                "expected_outcome": "Wait and retry"
-            }
+            # If direct parsing fails, try to extract JSON from markdown code block
+            try:
+                import re
+                json_match = re.search(r'```json\n(.*?)```', response, re.DOTALL)
+                if json_match:
+                    action_plan = json.loads(json_match.group(1))
+                    return action_plan
+                else:
+                    raise ValueError("No JSON found in LLM response")
+            except (json.JSONDecodeError, ValueError) as e:
+                # Fallback jika response bukan JSON valid atau tidak ada JSON di markdown
+                print(f"Failed to parse LLM response: {e}. Raw response: {response[:200]}...")
+                return {
+                    "reasoning": "Failed to parse LLM response",
+                    "tool_name": "wait",
+                    "parameters": {"seconds": 1},
+                    "expected_outcome": "Wait and retry"
+                }
 
 def create_llm_interface(provider: str = "openai", **kwargs) -> LLMInterface:
     """Factory function untuk membuat LLM interface"""
