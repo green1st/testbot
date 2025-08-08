@@ -31,10 +31,7 @@ app.add_middleware(
 # Initialize agent orchestrator
 orchestrator = AgentOrchestrator()
 
-@app.on_startup
-async def startup_event():
-    """Initialize agent on startup"""
-    await orchestrator.initialize()
+app.add_event_handler("startup", orchestrator.initialize)
 
 @app.get("/")
 async def root():
