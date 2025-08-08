@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  autonomous-agent:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined
+    shm_size: 2gb
+    networks:
+      - agent-network
+
+networks:
+  agent-network:
+    driver: bridge
+
