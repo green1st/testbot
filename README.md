@@ -1,265 +1,235 @@
-# Autonomous Agent System
+# Autonomous Agent - AI Browser Automation
 
-Sistem agent otomatis dengan kemampuan browser automation yang dapat beroperasi dalam lingkungan sandbox menggunakan Docker. Agent ini menggunakan Large Language Model (LLM) untuk perencanaan dan dapat melakukan berbagai tugas web automation secara otomatis.
+Sistem agent otomatis yang dapat melakukan browser automation dengan antarmuka pengguna yang canggih, mirip dengan Manus.ai.
 
 ## 🚀 Fitur Utama
 
-- **Lingkungan Sandbox**: Berjalan dalam container Docker yang terisolasi dan aman
-- **LLM Integration**: Mendukung OpenAI GPT dan Anthropic Claude untuk perencanaan cerdas
-- **Browser Automation**: Menggunakan Playwright untuk kontrol browser yang powerful
+### Backend Agent
+- **Browser Automation**: Menggunakan Playwright untuk kontrol browser otomatis
+- **LLM Integration**: Mendukung OpenAI GPT dan Anthropic Claude
 - **Loop Perencanaan-Eksekusi-Observasi**: Siklus otomatis untuk mencapai tujuan
-- **RESTful API**: Interface HTTP untuk integrasi dengan aplikasi lain
-- **Toolset Lengkap**: Kumpulan tools untuk navigasi, klik, input, dan pembacaan DOM
+- **RESTful API**: Interface HTTP untuk integrasi
+- **WebSocket Support**: Real-time updates dan komunikasi
 
-## 🏗️ Arsitektur Sistem
+### Frontend UI
+- **Modern React Interface**: Antarmuka pengguna yang responsif dan intuitif
+- **Real-time Monitoring**: Melihat progress agent secara langsung
+- **Task Builder**: Template untuk membuat task dengan mudah
+- **Screenshot Viewer**: Melihat screenshot browser saat agent bekerja
+- **Task History**: Riwayat task yang pernah dijalankan
+- **Execution Logs**: Log detail dari setiap langkah eksekusi
+
+### Kemampuan Agent
+- **Navigate**: Browse ke website tertentu
+- **Click**: Klik elemen di halaman web
+- **Type**: Mengisi form dan input field
+- **Read DOM**: Membaca dan mengekstrak konten halaman
+- **Wait**: Menunggu elemen atau kondisi tertentu
+- **Screenshot**: Mengambil screenshot halaman
+
+## 📁 Struktur Proyek
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        User Request (HTTP API)                  │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────────────┐
-│                   Agent Orchestrator                            │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
-│  │ LLM Interface│  │Planning Logic│  │      Toolset           │  │
-│  │(OpenAI/Claude)│  │             │  │ • navigate()           │  │
-│  └─────────────┘  └─────────────┘  │ • click()              │  │
-│                                    │ • type()               │  │
-│                                    │ • read_dom()           │  │
-│                                    │ • wait()               │  │
-│                                    └─────────────────────────┘  │
-└─────────────────────────┬───────────────────────────────────────┘
-                          │
-┌─────────────────────────▼───────────────────────────────────────┐
-│                Docker Sandbox Environment                       │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │              Browser Manager (Playwright)               │    │
-│  │  ┌─────────────────┐    ┌─────────────────────────────┐ │    │
-│  │  │ Browser Instance │◄──►│        Web Page (DOM)       │ │    │
-│  │  │   (Chromium)    │    │                             │ │    │
-│  │  └─────────────────┘    └─────────────────────────────┘ │    │
-│  └─────────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────────┘
+autonomous-agent/
+├── agent/                  # Backend agent modules
+│   ├── browser_manager.py  # Playwright browser management
+│   ├── llm_interface.py    # LLM integration
+│   ├── orchestrator.py     # Main agent orchestrator
+│   ├── toolset.py         # Agent tools
+│   └── models.py          # Data models
+├── agent-ui/              # Frontend React application
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom React hooks
+│   │   ├── services/      # API services
+│   │   └── App.jsx        # Main application
+│   └── package.json       # Frontend dependencies
+├── main.py                # FastAPI backend server
+├── requirements.txt       # Python dependencies
+├── docker-compose.yml     # Docker configuration
+└── README.md             # This file
 ```
-
-## 📋 Persyaratan Sistem
-
-- **Docker**: Untuk menjalankan lingkungan sandbox
-- **Python 3.11+**: Untuk aplikasi utama
-- **API Key**: OpenAI atau Anthropic untuk LLM functionality
 
 ## 🛠️ Instalasi
 
-### 1. Clone Repository
+### Metode 1: Docker (Disarankan)
 
-```bash
-git clone <repository-url>
-cd autonomous-agent
-```
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/green1st/testbot.git
+   cd testbot
+   ```
 
-### 2. Setup Environment Variables
+2. **Setup environment variables**:
+   ```bash
+   cp .env.example .env
+   # Edit .env dan isi API keys Anda
+   ```
 
-```bash
-cp .env.example .env
-# Edit .env file dengan API keys Anda
-```
+3. **Jalankan dengan Docker**:
+   ```bash
+   docker-compose up -d
+   ```
 
-### 3. Build Docker Image
+4. **Akses aplikasi**:
+   - Backend API: http://localhost:8000
+   - Frontend UI: http://localhost:3000
 
-```bash
-docker build -t autonomous-agent .
-```
+### Metode 2: Instalasi Lokal
 
-### 4. Run dengan Docker Compose
+1. **Clone repository**:
+   ```bash
+   git clone https://github.com/green1st/testbot.git
+   cd testbot
+   ```
 
-```bash
-docker-compose up -d
-```
+2. **Setup Python environment**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   # atau
+   venv\Scripts\activate     # Windows
+   
+   pip install -r requirements.txt
+   python -m playwright install chromium
+   ```
 
-### 5. Instalasi Lokal (Development)
+3. **Setup environment variables**:
+   ```bash
+   cp .env.example .env
+   # Edit .env dan isi API keys Anda
+   ```
 
-```bash
-# Install dependencies
-pip install -r requirements.txt
+4. **Jalankan backend**:
+   ```bash
+   python start_server.py
+   ```
 
-# Install Playwright browsers
-playwright install chromium
+5. **Jalankan frontend** (terminal baru):
+   ```bash
+   cd agent-ui
+   npm install
+   npm run dev
+   ```
 
-# Run server
-python start_server.py
-```
-
-## 🎯 Penggunaan
-
-### API Endpoints
-
-#### 1. Health Check
-```http
-GET /
-```
-
-#### 2. Execute Agent Task
-```http
-POST /agent/execute
-Content-Type: application/json
-
-{
-    "goal": "Navigate to example.com and read the page content",
-    "max_iterations": 5,
-    "timeout": 300
-}
-```
-
-#### 3. Get Agent Status
-```http
-GET /agent/status
-```
-
-#### 4. Stop Current Task
-```http
-POST /agent/stop
-```
-
-### Contoh Penggunaan dengan Python
-
-```python
-import requests
-
-# Execute task
-response = requests.post("http://localhost:8000/agent/execute", json={
-    "goal": "Navigate to Google and search for 'autonomous agent'",
-    "max_iterations": 10
-})
-
-result = response.json()
-print(f"Status: {result['status']}")
-print(f"Steps: {len(result['steps'])}")
-```
-
-### Contoh Penggunaan dengan cURL
-
-```bash
-# Execute simple navigation task
-curl -X POST "http://localhost:8000/agent/execute" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "goal": "Navigate to example.com and take a screenshot",
-       "max_iterations": 3
-     }'
-```
+6. **Akses aplikasi**:
+   - Backend API: http://localhost:8000
+   - Frontend UI: http://localhost:5173
 
 ## 🔧 Konfigurasi
 
 ### Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `OPENAI_API_KEY` | OpenAI API key untuk GPT models | - |
-| `ANTHROPIC_API_KEY` | Anthropic API key untuk Claude models | - |
-| `LLM_PROVIDER` | Provider LLM (openai/anthropic) | openai |
-| `BROWSER_TYPE` | Jenis browser (chromium/firefox/webkit) | chromium |
-| `HEADLESS` | Mode headless browser (true/false) | true |
-| `HOST` | Server host | 0.0.0.0 |
-| `PORT` | Server port | 8000 |
+```ini
+# OpenAI API Key (untuk GPT models)
+OPENAI_API_KEY=sk-your_openai_api_key_here
 
-### Toolset Configuration
+# Anthropic API Key (untuk Claude models)  
+ANTHROPIC_API_KEY=sk-ant-api03-your_anthropic_api_key_here
 
-Agent dilengkapi dengan toolset berikut:
+# Agent Configuration
+LLM_PROVIDER=openai  # atau anthropic
+BROWSER_TYPE=chromium  # chromium, firefox, atau webkit
+HEADLESS=true  # true untuk headless mode, false untuk GUI mode
 
-- **navigate(url)**: Navigate ke URL tertentu
-- **click(selector)**: Klik element berdasarkan CSS selector
-- **type(selector, text)**: Input text ke field
-- **read_dom()**: Baca dan ringkas DOM page
-- **wait(seconds)**: Wait untuk durasi tertentu
+# Server Configuration
+HOST=0.0.0.0
+PORT=8000
+DEBUG=false
+```
+
+## 📖 Cara Penggunaan
+
+### 1. Melalui Web UI
+
+1. Buka http://localhost:3000 (atau port yang dikonfigurasi)
+2. Ketik task yang ingin dilakukan di text area
+3. Klik "Execute" untuk menjalankan task
+4. Monitor progress melalui progress bar dan logs
+5. Lihat hasil di task history
+
+### 2. Melalui API
+
+```bash
+curl -X POST "http://localhost:8000/agent/execute" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "goal": "Navigate to Google and search for autonomous agents",
+       "max_iterations": 10
+     }'
+```
+
+### 3. Contoh Task
+
+- "Navigate to Google and search for autonomous agents"
+- "Go to Amazon and search for wireless headphones, show me the top 5 results"
+- "Visit https://example.com and extract all the contact information"
+- "Fill out the contact form on https://example.com/contact with my information"
+
+## 🔍 API Endpoints
+
+- `GET /` - Health check
+- `POST /agent/execute` - Execute agent task
+- `GET /agent/status` - Get current agent status
+- `POST /agent/stop` - Stop current task
+- `WebSocket /ws` - Real-time updates
 
 ## 🧪 Testing
 
-### Run All Tests
-
 ```bash
+# Test backend
 python test_agent.py
+
+# Test frontend
+cd agent-ui
+npm test
 ```
 
-### Run Demo
+## 🚀 Deployment
 
+### Docker Deployment
 ```bash
-python demo.py
+docker-compose up -d --build
 ```
 
-### Manual Testing
-
-```bash
-# Start server
-python start_server.py
-
-# Test dengan browser
-curl http://localhost:8000/
-```
-
-## 📁 Struktur Project
-
-```
-autonomous-agent/
-├── agent/
-│   ├── __init__.py
-│   ├── models.py              # Data models
-│   ├── llm_interface.py       # LLM integration
-│   ├── browser_manager.py     # Browser automation
-│   ├── toolset.py            # Available tools
-│   └── orchestrator.py       # Main agent loop
-├── logs/                     # Log files
-├── data/                     # Data storage
-├── screenshots/              # Screenshots
-├── Dockerfile               # Docker configuration
-├── docker-compose.yml       # Docker Compose setup
-├── requirements.txt         # Python dependencies
-├── main.py                 # FastAPI application
-├── start_server.py         # Server startup script
-├── test_agent.py           # Test suite
-├── demo.py                 # Demo script
-└── README.md               # Documentation
-```
-
-## 🔍 Troubleshooting
-
-### Common Issues
-
-1. **Browser tidak bisa start**
-   - Pastikan Docker memiliki akses ke display (untuk non-headless mode)
-   - Check apakah Playwright browsers sudah terinstall
-
-2. **LLM API Error**
-   - Verify API key sudah benar
-   - Check quota dan billing account
-   - Pastikan model yang digunakan tersedia
-
-3. **Permission Denied**
-   - Pastikan user memiliki akses ke Docker
-   - Check file permissions untuk direktori project
-
-### Debug Mode
-
-```bash
-# Enable debug logging
-export DEBUG=true
-python start_server.py
-```
+### Manual Deployment
+1. Setup production environment variables
+2. Build frontend: `cd agent-ui && npm run build`
+3. Serve static files through backend
+4. Run with production WSGI server
 
 ## 🤝 Contributing
 
 1. Fork repository
 2. Create feature branch
-3. Make changes
-4. Add tests
-5. Submit pull request
+3. Commit changes
+4. Push to branch
+5. Create Pull Request
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+MIT License - lihat file LICENSE untuk detail.
 
-## 🙏 Acknowledgments
+## 🆘 Troubleshooting
 
-- [Playwright](https://playwright.dev/) untuk browser automation
-- [FastAPI](https://fastapi.tiangolo.com/) untuk web framework
-- [OpenAI](https://openai.com/) dan [Anthropic](https://anthropic.com/) untuk LLM APIs
+### Common Issues
+
+1. **Browser tidak terbuka**: Pastikan Playwright browser terinstal
+   ```bash
+   python -m playwright install chromium
+   ```
+
+2. **API Key error**: Periksa file `.env` dan pastikan API key valid
+
+3. **Port sudah digunakan**: Ubah port di konfigurasi atau hentikan service yang menggunakan port tersebut
+
+4. **Frontend tidak terhubung ke backend**: Pastikan backend berjalan di port 8000 dan CORS dikonfigurasi dengan benar
+
+### Support
+
+Jika mengalami masalah, silakan buat issue di GitHub repository atau hubungi tim pengembang.
+
+---
+
+**Autonomous Agent** - Bringing AI-powered automation to your browser! 🤖✨
 
